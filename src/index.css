@@ -1,0 +1,276 @@
+@import "tailwindcss";
+
+@theme {
+  --color-space-dark: #0f0f23;
+  --color-space-secondary: #1a1a3e;
+  --color-accent: #6366f1;
+  --color-highlight: #22d3ee;
+  --color-text: #e2e8f0;
+  --color-text-muted: #94a3b8;
+
+  --animate-twinkle: twinkle 3s ease-in-out infinite;
+  --animate-glow: glow 3s ease-in-out infinite;
+  --animate-float-slow: float-slow 18s ease-in-out infinite;
+  --animate-float-medium: float-medium 12s ease-in-out infinite;
+  --animate-float-reverse: float-reverse 16s ease-in-out infinite;
+  --animate-rocket-diagonal: rocket-diagonal 28s linear infinite;
+  --animate-rocket-horizontal: rocket-horizontal 32s linear infinite;
+  --animate-rocket-up: rocket-up 35s linear infinite;
+  --animate-nebula: nebula 20s ease-in-out infinite;
+  --animate-nebula-delayed: nebula 24s ease-in-out infinite 4s;
+  --animate-flame: flame 0.25s ease-in-out infinite alternate;
+  --animate-scanlines: scanlines 8s linear infinite;
+  --animate-launch-bob: launch-bob 2.5s ease-in-out infinite;
+  --animate-crt-glitch: crt-glitch 0.55s steps(2, end);
+  --animate-astronaut-climb: astronaut-climb 14s linear infinite;
+  --animate-alien-chase: alien-chase 14s linear infinite;
+  --animate-astronaut-arm: astronaut-arm 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.2); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(20px, -30px) rotate(3deg); }
+  66% { transform: translate(-15px, 15px) rotate(-2deg); }
+}
+
+@keyframes float-medium {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-25px, -20px); }
+}
+
+@keyframes float-reverse {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -15px) scale(1.05); }
+}
+
+@keyframes rocket-diagonal {
+  0% {
+    transform: translate(0, 0) rotate(45deg);
+    opacity: 0;
+  }
+  5% { opacity: 1; }
+  90% { opacity: 1; }
+  100% {
+    transform: translate(120vw, 80vh) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes rocket-horizontal {
+  0% {
+    transform: translate(0, 0) rotate(90deg);
+    opacity: 0;
+  }
+  5% { opacity: 1; }
+  90% { opacity: 1; }
+  100% {
+    transform: translate(120vw, -20vh) rotate(90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes rocket-up {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  5% { opacity: 1; }
+  90% { opacity: 1; }
+  100% {
+    transform: translate(-15vw, -120vh) rotate(-10deg);
+    opacity: 0;
+  }
+}
+
+@keyframes nebula {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.15) translate(20px, -10px);
+  }
+}
+
+@keyframes flame {
+  from { transform: scaleY(0.85); opacity: 0.8; }
+  to { transform: scaleY(1.15); opacity: 1; }
+}
+
+@keyframes scanlines {
+  from { background-position: 0 0; }
+  to { background-position: 0 100px; }
+}
+
+@keyframes launch-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes astronaut-climb {
+  0% {
+    top: 92%;
+    opacity: 0;
+    transform: translateX(-50%) rotate(-4deg);
+  }
+  5% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(calc(-50% + 3px)) rotate(4deg);
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    top: 0%;
+    opacity: 0;
+    transform: translateX(-50%) rotate(-2deg);
+  }
+}
+
+@keyframes alien-chase {
+  0% {
+    top: 95%;
+    opacity: 0;
+    transform: translateX(-50%) rotate(6deg) scale(0.95);
+  }
+  5% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(calc(-50% - 4px)) rotate(-6deg) scale(1);
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    top: 3%;
+    opacity: 0;
+    transform: translateX(-50%) rotate(4deg) scale(0.95);
+  }
+}
+
+@keyframes astronaut-arm {
+  from { transform: rotate(-6deg); }
+  to { transform: rotate(8deg); }
+}
+
+@keyframes crt-glitch {
+  0% {
+    transform: none;
+    filter: none;
+  }
+  12% {
+    transform: translate(-4px, 1px) skewX(-8deg);
+    filter: contrast(1.4) saturate(1.8) hue-rotate(20deg);
+  }
+  24% {
+    transform: translate(5px, -2px) skewX(6deg);
+    filter: contrast(1.6) brightness(1.15);
+  }
+  36% {
+    transform: translate(-3px, 3px) skewY(2deg);
+    filter: hue-rotate(-30deg) contrast(1.3);
+  }
+  48% {
+    transform: translate(6px, -1px) scaleY(1.04);
+    filter: contrast(1.8) saturate(0.4);
+  }
+  60% {
+    transform: translate(-2px, 2px) skewX(-4deg);
+    filter: brightness(1.3) hue-rotate(50deg);
+  }
+  72% {
+    transform: translate(3px, 0) skewX(3deg);
+    filter: contrast(1.2);
+  }
+  100% {
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes crt-slice {
+  0%,
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+  15% {
+    clip-path: inset(18% 0 55% 0);
+    transform: translateX(-8px);
+  }
+  30% {
+    clip-path: inset(48% 0 20% 0);
+    transform: translateX(10px);
+  }
+  50% {
+    clip-path: inset(8% 0 70% 0);
+    transform: translateX(-5px);
+  }
+  70% {
+    clip-path: inset(62% 0 12% 0);
+    transform: translateX(7px);
+  }
+}
+
+.crt-glitch {
+  position: relative;
+  animation: crt-glitch 0.55s steps(2, end);
+}
+
+.crt-glitch::before,
+.crt-glitch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.75;
+  animation: crt-slice 0.55s steps(2, end);
+}
+
+.crt-glitch::before {
+  background-color: rgba(34, 211, 238, 0.35);
+  transform: translateX(-3px);
+}
+
+.crt-glitch::after {
+  background-color: rgba(239, 68, 68, 0.3);
+  transform: translateX(3px);
+  animation-delay: 0.03s;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-space-dark);
+  color: var(--color-text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+section {
+  scroll-margin-top: 5rem;
+}
