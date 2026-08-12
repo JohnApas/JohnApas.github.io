@@ -149,6 +149,13 @@ export interface ContactContent {
   messageLabel: string
   messagePlaceholder: string
   submitLabel: string
+  submittingLabel: string
+  successMessage: string
+  errorMessage: string
+  activationMessage: string
+  successTitle: string
+  errorTitle: string
+  activationTitle: string
   mailSubjectPrefix: string
   email?: string
   phone?: string

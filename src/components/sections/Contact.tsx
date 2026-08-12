@@ -1,4 +1,5 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useId, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { contact } from '../../data/contact'
 import { useScrollToSection } from '../../hooks/useScrollToSection'
 import { Button } from '../common/Button'
@@ -7,6 +8,12 @@ import { SectionTitle } from '../common/SectionTitle'
 const inputClass =
   'w-full rounded-2xl border-0 bg-space-dark px-4 py-3.5 text-base text-text outline-none ring-1 ring-border/60 transition-[box-shadow,background-color] placeholder:text-text-muted/50 focus:bg-surface focus:ring-2 focus:ring-accent/40'
 
+const PROMPT_VISIBLE_MS = 2000
+const PROMPT_EXIT_MS = 280
+
+type FormStatus = 'idle' | 'submitting' | 'success' | 'error' | 'activation'
+type PromptKind = 'success' | 'error' | 'activation'
+
 export function Contact() {
   const { scrollToSection } = useScrollToSection()
   const [formData, setFormData] = useState({
@@ -14,14 +21,118 @@ export function Contact() {
     email: '',
     message: '',
   })
+  const [status, setStatus] = useState<FormStatus>('idle')
+  const [honeypot, setHoneypot] = useState('')
+  const [prompt, setPrompt] = useState<{
+    kind: PromptKind
+    title: string
+    message: string
+  } | null>(null)
+  const [promptClosing, setPromptClosing] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const showPrompt = (kind: PromptKind, title: string, message: string) => {
+    setPromptClosing(false)
+    setPrompt({ kind, title, message })
+  }
+
+  const dismissPrompt = () => {
+    setPromptClosing(true)
+  }
+
+  useEffect(() => {
+    if (!prompt || promptClosing) return
+
+    const timer = window.setTimeout(() => {
+      setPromptClosing(true)
+    }, PROMPT_VISIBLE_MS)
+
+    return () => window.clearTimeout(timer)
+  }, [prompt, promptClosing])
+
+  useEffect(() => {
+    if (!promptClosing) return
+
+    const timer = window.setTimeout(() => {
+      setPrompt(null)
+      setPromptClosing(false)
+      setStatus('idle')
+    }, PROMPT_EXIT_MS)
+
+    return () => window.clearTimeout(timer)
+  }, [promptClosing])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!contact.email || status === 'submitting') return
 
-    const mailtoLink = `mailto:${contact.email ?? ''}?subject=${encodeURIComponent(
-      `${contact.mailSubjectPrefix} ${formData.name}`,
-    )}&body=${encodeURIComponent(formData.message)}`
-    window.location.href = mailtoLink
+    // Bot filled the honeypot — pretend success
+    if (honeypot.trim()) {
+      setStatus('success')
+      showPrompt('success', contact.successTitle, contact.successMessage)
+      return
+    }
+
+    setStatus('submitting')
+
+    try {
+      const payload = new FormData()
+      payload.append('name', formData.name)
+      payload.append('email', formData.email)
+      payload.append('message', formData.message)
+      payload.append(
+        '_subject',
+        `${contact.mailSubjectPrefix} ${formData.name}`,
+      )
+      payload.append('_template', 'table')
+      payload.append('_captcha', 'false')
+      payload.append('_replyto', formData.email)
+
+      const response = await fetch(
+        `https://formsubmit.co/ajax/${encodeURIComponent(contact.email)}`,
+        {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: payload,
+        },
+      )
+
+      const result = (await response.json()) as {
+        success?: string | boolean
+        message?: string
+      }
+
+      const apiMessage = result.message ?? ''
+      const isSuccess =
+        result.success === true || result.success === 'true'
+      const needsActivation = /activat/i.test(apiMessage)
+
+      if (needsActivation) {
+        setStatus('activation')
+        showPrompt(
+          'activation',
+          contact.activationTitle,
+          contact.activationMessage,
+        )
+        return
+      }
+
+      if (!response.ok || !isSuccess) {
+        setStatus('error')
+        showPrompt(
+          'error',
+          contact.errorTitle,
+          apiMessage || contact.errorMessage,
+        )
+        return
+      }
+
+      setStatus('success')
+      setFormData({ name: '', email: '', message: '' })
+      showPrompt('success', contact.successTitle, contact.successMessage)
+    } catch {
+      setStatus('error')
+      showPrompt('error', contact.errorTitle, contact.errorMessage)
+    }
   }
 
   return (
@@ -113,6 +224,17 @@ export function Contact() {
               </h3>
 
               <form onSubmit={handleSubmit} className="space-y-5">
+                <input
+                  type="text"
+                  name="_gotcha"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
+                />
+
                 <div>
                   <label
                     htmlFor="name"
@@ -124,11 +246,13 @@ export function Contact() {
                     id="name"
                     type="text"
                     required
+                    name="name"
                     placeholder={contact.namePlaceholder}
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
+                    disabled={status === 'submitting'}
                     className={inputClass}
                   />
                 </div>
@@ -144,11 +268,13 @@ export function Contact() {
                     id="email"
                     type="email"
                     required
+                    name="email"
                     placeholder={contact.emailPlaceholder}
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
+                    disabled={status === 'submitting'}
                     className={inputClass}
                   />
                 </div>
@@ -163,18 +289,26 @@ export function Contact() {
                   <textarea
                     id="message"
                     required
+                    name="message"
                     rows={5}
                     placeholder={contact.messagePlaceholder}
                     value={formData.message}
                     onChange={(e) =>
                       setFormData({ ...formData, message: e.target.value })
                     }
+                    disabled={status === 'submitting'}
                     className={`${inputClass} min-h-[140px] resize-none`}
                   />
                 </div>
 
-                <Button type="submit" className="w-full sm:w-auto sm:min-w-[180px]">
-                  {contact.submitLabel}
+                <Button
+                  type="submit"
+                  disabled={status === 'submitting'}
+                  className="w-full sm:w-auto sm:min-w-[180px] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {status === 'submitting'
+                    ? contact.submittingLabel
+                    : contact.submitLabel}
                 </Button>
               </form>
             </div>
@@ -193,7 +327,151 @@ export function Contact() {
           </button>
         </div>
       </div>
+
+      {prompt && (
+        <AppleAlertPrompt
+          kind={prompt.kind}
+          title={prompt.title}
+          message={prompt.message}
+          closing={promptClosing}
+          onDismiss={dismissPrompt}
+        />
+      )}
     </section>
+  )
+}
+
+function AppleAlertPrompt({
+  kind,
+  title,
+  message,
+  closing,
+  onDismiss,
+}: {
+  kind: PromptKind
+  title: string
+  message: string
+  closing: boolean
+  onDismiss: () => void
+}) {
+  const titleId = useId()
+  const messageId = useId()
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onDismiss()
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [onDismiss])
+
+  return createPortal(
+    <div
+      className="pointer-events-none fixed inset-x-0 top-0 z-110 flex justify-center p-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:justify-end sm:p-4 sm:pt-[max(1rem,env(safe-area-inset-top))]"
+      aria-live="polite"
+    >
+      <div
+        role="status"
+        aria-labelledby={titleId}
+        aria-describedby={messageId}
+        className={`apple-notification pointer-events-auto w-full max-w-[380px] overflow-hidden rounded-[18px] backdrop-blur-[40px] ${
+          closing ? 'apple-notification-out' : 'apple-notification-in'
+        }`}
+        onClick={onDismiss}
+      >
+        <div className="flex gap-3 px-3.5 py-3">
+          <PromptIcon kind={kind} />
+
+          <div className="min-w-0 flex-1 pt-0.5">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="apple-notification-app text-[12px] font-semibold tracking-wide uppercase">
+                Portfolio
+              </p>
+              <p className="apple-notification-time shrink-0 text-[12px]">
+                now
+              </p>
+            </div>
+            <h3
+              id={titleId}
+              className="apple-notification-title mt-0.5 text-[14px] leading-tight font-semibold tracking-tight"
+            >
+              {title}
+            </h3>
+            <p
+              id={messageId}
+              className="apple-notification-message mt-0.5 text-[13px] leading-snug"
+            >
+              {message}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  )
+}
+
+function PromptIcon({ kind }: { kind: PromptKind }) {
+  if (kind === 'success') {
+    return (
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#30d158] text-white shadow-sm">
+        <svg
+          className="h-6 w-6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.6}
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+      </span>
+    )
+  }
+
+  if (kind === 'activation') {
+    return (
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#ff9f0a] text-white shadow-sm">
+        <svg
+          className="h-6 w-6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.2}
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+          />
+        </svg>
+      </span>
+    )
+  }
+
+  return (
+    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#ff453a] text-white shadow-sm">
+      <svg
+        className="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.6}
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6 6l12 12M18 6 6 18"
+        />
+      </svg>
+    </span>
   )
 }
 
