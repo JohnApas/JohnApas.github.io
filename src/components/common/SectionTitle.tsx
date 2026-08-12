@@ -5,14 +5,15 @@ interface SectionTitleProps {
 
 export function SectionTitle({ title, subtitle }: SectionTitleProps) {
   return (
-    <div className="mb-12 text-center">
-      <h2 className="bg-gradient-to-r from-accent via-highlight to-accent bg-clip-text text-3xl font-bold tracking-tight text-transparent md:text-4xl">
+    <div className="mb-10 text-center md:mb-16">
+      <h2 className="text-3xl font-semibold tracking-tight text-text sm:text-4xl md:text-5xl">
         {title}
       </h2>
       {subtitle && (
-        <p className="mt-3 text-text-muted">{subtitle}</p>
+        <p className="mx-auto mt-3 max-w-2xl text-base font-normal text-text-muted sm:mt-4 sm:text-lg md:text-xl">
+          {subtitle}
+        </p>
       )}
-      <div className="mx-auto mt-4 h-1 w-20 rounded-full bg-gradient-to-r from-transparent via-accent to-transparent" />
     </div>
   )
 }

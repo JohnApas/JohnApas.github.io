@@ -9,9 +9,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-accent text-white hover:bg-accent/90 shadow-[0_0_20px_rgba(99,102,241,0.4)]',
+    'bg-accent text-white hover:bg-[#0077ed] active:bg-[#006edb]',
   secondary:
-    'border border-highlight/50 text-highlight hover:bg-highlight/10 shadow-[0_0_15px_rgba(34,211,238,0.2)]',
+    'bg-[#424245] text-white hover:bg-[#525256] active:bg-[#3a3a3d]',
   ghost: 'text-text-muted hover:text-text hover:bg-white/5',
 }
 
@@ -23,7 +23,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300 ${variantStyles[variant]} ${className}`}
+      className={`rounded-full px-[22px] py-[11px] text-[15px] font-medium tracking-[-0.01em] transition-colors duration-200 active:scale-[0.97] ${variantStyles[variant]} ${className}`}
       {...props}
     >
       {children}

@@ -1,143 +1,150 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { aboutMe } from '../../data/aboutMe'
+import { generateResumePdf } from '../../utils/generateResumePdf'
 import { LaunchScreen } from '../common/LaunchScreen'
 import { SectionTitle } from '../common/SectionTitle'
 import { AboutCarousel } from './AboutCarousel'
 
-const GLITCH_DURATION_MS = 550
+const TRASH_CLOSE_MS = 520
 
 export function About() {
-  const [isGlitching, setIsGlitching] = useState(false)
-  const [glitchKey, setGlitchKey] = useState(0)
-
+  const [showResumeTerminal, setShowResumeTerminal] = useState(false)
+  const [isTrashing, setIsTrashing] = useState(false)
   const initials = aboutMe.name
     .split(' ')
     .map((n) => n[0])
     .join('')
 
-  const triggerGlitch = useCallback(() => {
-    setIsGlitching(true)
-    setGlitchKey((key) => key + 1)
-  }, [])
-
-  useEffect(() => {
-    if (!isGlitching) return
-
-    const timer = window.setTimeout(() => {
-      setIsGlitching(false)
-    }, GLITCH_DURATION_MS)
-
-    return () => window.clearTimeout(timer)
-  }, [isGlitching, glitchKey])
+  const closeResumeTerminal = useCallback(() => {
+    if (!showResumeTerminal || isTrashing) return
+    setIsTrashing(true)
+    window.setTimeout(() => {
+      setShowResumeTerminal(false)
+      setIsTrashing(false)
+    }, TRASH_CLOSE_MS)
+  }, [isTrashing, showResumeTerminal])
 
   return (
-    <section id="about" className="px-6 py-24">
-      <div className="mx-auto max-w-6xl">
+    <section id="about" className="px-4 py-16 sm:px-6 sm:py-20 md:py-28">
+      <div className="mx-auto max-w-5xl">
         <SectionTitle title={aboutMe.title} subtitle={aboutMe.subtitle} />
 
-        <div className="grid items-center gap-12 md:grid-cols-2">
+        <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
           <div className="flex justify-center">
             <LaunchScreen
-              content={aboutMe.launchScreen}
-              className="max-w-md"
-              contentClassName="!py-8 !px-6 md:!py-10"
+              content={
+                showResumeTerminal
+                  ? aboutMe.resumeLaunchScreen
+                  : aboutMe.launchScreen
+              }
+              className="w-full max-w-md"
+              windowClassName={isTrashing ? 'terminal-to-trash' : ''}
+              contentClassName={
+                showResumeTerminal
+                  ? '!py-5 !px-4 sm:!py-6 sm:!px-5 text-left'
+                  : '!py-6 !px-4 sm:!py-8 sm:!px-6 md:!py-10'
+              }
+              onClose={showResumeTerminal ? closeResumeTerminal : undefined}
+              onMinimize={showResumeTerminal ? closeResumeTerminal : undefined}
+              closeAriaLabel={aboutMe.resume.closeAriaLabel}
+              minimizeAriaLabel={aboutMe.resume.closeAriaLabel}
             >
-              <div
-                key={glitchKey}
-                className={`mx-auto h-52 w-52 overflow-hidden rounded-full md:h-64 md:w-64 ${
-                  isGlitching ? 'crt-glitch' : ''
-                }`}
-                style={
-                  aboutMe.image
-                    ? {
-                        backgroundImage: `url(${aboutMe.image})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                      }
-                    : undefined
-                }
-              >
-                {aboutMe.image ? (
-                  <img
-                    src={aboutMe.image}
-                    alt={aboutMe.imageAlt ?? aboutMe.name}
-                    className="h-full w-full object-cover ring-2 ring-highlight/40 shadow-[0_0_30px_rgba(34,211,238,0.3)]"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center border-2 border-highlight/40 bg-space-secondary text-5xl font-bold text-accent">
-                    {initials}
-                  </div>
-                )}
-              </div>
-
-              {aboutMe.imageCaption && (
-                <p className="mt-4 flex items-center justify-center gap-2 text-sm italic text-text-muted">
-                  <svg
-                    className="h-4 w-4 shrink-0 text-highlight"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
+              {showResumeTerminal ? (
+                <ResumeTerminal />
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setShowResumeTerminal(true)}
+                    aria-label={aboutMe.resume.openAriaLabel}
+                    title={aboutMe.resume.clickHint}
+                    className="group relative mx-auto block h-44 w-44 overflow-hidden rounded-full transition-transform hover:scale-[1.02] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:h-52 sm:w-52 md:h-64 md:w-64"
                   >
-                    <rect x="9" y="9" width="6" height="6" rx="1" />
-                    <rect
-                      x="2"
-                      y="10.5"
-                      width="5"
-                      height="3"
-                      rx="0.5"
-                      opacity="0.85"
-                    />
-                    <rect
-                      x="17"
-                      y="10.5"
-                      width="5"
-                      height="3"
-                      rx="0.5"
-                      opacity="0.85"
-                    />
-                    <rect x="7" y="11.25" width="2" height="1.5" />
-                    <rect x="15" y="11.25" width="2" height="1.5" />
-                    <circle
-                      cx="15.5"
-                      cy="7.5"
-                      r="2"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.2"
-                    />
-                    <line
-                      x1="14"
-                      y1="9"
-                      x2="12.5"
-                      y2="10.5"
-                      stroke="currentColor"
-                      strokeWidth="1.2"
-                    />
-                  </svg>
-                  {aboutMe.imageCaption}
-                </p>
+                    {aboutMe.image ? (
+                      <img
+                        src={aboutMe.image}
+                        alt={aboutMe.imageAlt ?? aboutMe.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-space-secondary text-4xl font-semibold text-text sm:text-5xl">
+                        {initials}
+                      </div>
+                    )}
+                    <span className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/70 via-black/10 to-transparent pb-4 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                      <span className="rounded-full bg-white/15 px-3 py-1 font-mono text-[11px] text-white backdrop-blur-sm">
+                        ./resume.sh
+                      </span>
+                    </span>
+                  </button>
+
+                  {aboutMe.imageCaption && (
+                    <p className="mt-4 text-sm text-text-muted">
+                      {aboutMe.imageCaption}
+                    </p>
+                  )}
+                </>
               )}
             </LaunchScreen>
           </div>
 
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-5 sm:space-y-6">
             {aboutMe.profileDetails && (
-              <p className="text-lg leading-relaxed text-text-muted">
+              <p className="text-base leading-relaxed text-pretty text-text-muted sm:text-lg">
                 {aboutMe.profileDetails}
               </p>
             )}
 
             {aboutMe.address && (
               <p className="text-sm text-text-muted">
-                <span className="text-highlight">{aboutMe.locationLabel}</span>{' '}
+                <span className="text-text">{aboutMe.locationLabel}</span>{' '}
                 {aboutMe.address}
               </p>
             )}
 
-            <AboutCarousel onSlideChange={triggerGlitch} />
+            <AboutCarousel />
           </div>
         </div>
       </div>
     </section>
+  )
+}
+
+function ResumeTerminal() {
+  const { resume } = aboutMe
+
+  return (
+    <div className="font-mono text-[12px] leading-relaxed text-white/85 sm:text-[13px]">
+      {resume.lines.map((line, index) => (
+        <p
+          key={`${index}-${line}`}
+          className={
+            line.startsWith('john@') || line.startsWith('#!/')
+              ? 'text-white/90'
+              : line.startsWith('#')
+                ? 'text-white/45'
+                : line.endsWith('.pdf')
+                  ? 'text-[#28c840]'
+                  : 'text-white/75'
+          }
+        >
+          {line || '\u00A0'}
+        </p>
+      ))}
+
+      <button
+        type="button"
+        onClick={generateResumePdf}
+        aria-label={resume.downloadLabel}
+        className="mt-4 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-[#2997ff] transition-colors hover:border-[#2997ff]/40 hover:bg-white/10"
+      >
+        <span aria-hidden="true">⬇</span>
+        <span>{resume.downloadCommand}</span>
+      </button>
+
+      <p className="mt-4 text-white/40">
+        tip: red or yellow closes this window
+      </p>
+    </div>
   )
 }

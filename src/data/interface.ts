@@ -1,11 +1,9 @@
 // Hero section interface
 export interface LaunchScreenContent {
+  /** macOS title bar text, e.g. "johnapas — zsh" */
   title: string
-  status: string
-  launchStatus?: string
-  altitude: string
-  liveFeed: string
-  velocity: string
+  /** Optional shell prompt at the bottom of the window */
+  prompt?: string
 }
 
 export interface HeroContent {
@@ -46,6 +44,17 @@ export interface AboutMeContent {
   imageAlt?: string
   imageCaption?: string
   launchScreen: LaunchScreenContent
+  resumeLaunchScreen: LaunchScreenContent
+  resume: {
+    fileName: string
+    filePath?: string
+    clickHint: string
+    openAriaLabel: string
+    closeAriaLabel: string
+    lines: string[]
+    downloadCommand: string
+    downloadLabel: string
+  }
   profileDetails?: string
   locationLabel: string
   address?: string
@@ -55,12 +64,24 @@ export interface AboutMeContent {
 }
 
 // Experience section interface
+export interface ExperienceProject {
+  id: number
+  title: string
+  description: string
+  role?: string
+  link?: string
+  image?: string
+  imageAlt?: string
+  techUsed?: string[]
+}
+
 export interface Experience {
   id: string
   companyName: string
   projectName?: string
   image?: string
-  link?: string
+  /** Projects shown in the Apple-style modal when “View Projects” is clicked */
+  projects?: ExperienceProject[]
   startDate?: string
   endDate?: string | 'Present'
   title: string
@@ -74,16 +95,32 @@ export interface ExperienceContent {
   title: string
   subtitle: string
   viewProjectLabel: string
+  projectsModalTitle?: string
   items: Experience[]
 }
 
-// Skills section interface
+// Skills (used by About carousel / profile)
 export type SkillCategory = 'frontend' | 'backend' | 'database' | 'tools' | 'other'
 
 export interface Skill {
   name: string
   category?: SkillCategory
   proficiency?: number
+}
+
+// Services section interface
+export interface ServiceItem {
+  number: string
+  title: string
+  description: string
+  icon: 'fullstack' | 'website' | 'integrations' | 'maintenance'
+  tech?: string[]
+}
+
+export interface ServicesContent {
+  title: string
+  subtitle: string
+  items: ServiceItem[]
 }
 
 // Contact section interface
@@ -93,8 +130,41 @@ export interface SocialLinks {
   twitter?: string
 }
 
+export interface ContactContent {
+  title: string
+  subtitle: string
+  infoTitle: string
+  infoDescription: string
+  emailLabel: string
+  phoneLabel: string
+  locationLabel: string
+  responseTimeLabel: string
+  responseTime: string
+  socialsLabel: string
+  formTitle: string
+  nameLabel: string
+  namePlaceholder: string
+  emailFieldLabel: string
+  emailPlaceholder: string
+  messageLabel: string
+  messagePlaceholder: string
+  submitLabel: string
+  mailSubjectPrefix: string
+  email?: string
+  phone?: string
+  address?: string
+  socials: SocialLinks
+  socialLabels: {
+    github: string
+    linkedin: string
+    twitter: string
+  }
+  backToTopLabel: string
+  backToTopTarget: string
+}
+
 // Profile / personal details interface
-// (used by About, Skills, and Contact sections)
+// (used by About and Contact sections)
 export interface Profile {
   name: string
   headline: string
@@ -106,4 +176,17 @@ export interface Profile {
   education: Education[]
   profileDetails?: string
   skills: Skill[]
+}
+
+// Resume / PDF generation
+export interface ResumeSkillCategory {
+  category: string
+  skills: string[]
+}
+
+export interface ResumeContent {
+  fileName: string
+  name: string
+  profile: string
+  coreSkills: ResumeSkillCategory[]
 }

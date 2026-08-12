@@ -4,14 +4,14 @@ import type { Profile } from './interface'
 
 export const profile: Profile = {
   name: 'John Apas',
-  headline: 'Building digital experiences across the cosmos of code.',
+  headline: 'Building modern and scalable apps.',
   currentPosition: 'Software Developer',
-  address: 'Philippines',
+  address: 'Cebu City, Cebu, 6000, Philippines',
   email: 'johnclyde.apas032647@gmail.com',
   phone: '',
   socials: {
     github: 'https://github.com/JohnApas',
-    linkedin: 'https://linkedin.com/in/johnapas',
+    linkedin: 'https://www.linkedin.com/in/john-clyde-apas-4a8799246/',
   },
   education: [
     {

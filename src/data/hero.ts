@@ -2,23 +2,19 @@ import type { HeroContent } from './interface'
 
 export const hero: HeroContent = {
   launchScreen: {
-    title: 'Mission Control',
-    status: 'SYS OK',
-    launchStatus: 'Launch Ready',
-    altitude: 'ALT: 000 km',
-    liveFeed: '● LIVE FEED',
-    velocity: 'VELOCITY: 0.0 m/s',
+    title: 'johnapas — zsh — 80x24',
+    prompt: 'john@portfolio ~ %',
   },
   eyebrow: '',
   name: 'John Apas',
-  headline: 'Building digital experiences across the cosmos of code.',
-  currentPosition: 'Software Developer',
+  headline: 'Turning ideas into scalable, real-world solutions.',
+  currentPosition: 'Full-Stack Software Engineer',
   primaryCta: {
-    label: 'Initiate Launch',
+    label: 'View Work',
     targetSection: 'experience',
   },
   secondaryCta: {
-    label: 'Open Channel',
+    label: 'Get in Touch',
     targetSection: 'contact',
   },
   scrollToSection: 'about',

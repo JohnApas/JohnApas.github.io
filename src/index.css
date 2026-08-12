@@ -1,12 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-space-dark: #0f0f23;
-  --color-space-secondary: #1a1a3e;
-  --color-accent: #6366f1;
-  --color-highlight: #22d3ee;
-  --color-text: #e2e8f0;
-  --color-text-muted: #94a3b8;
+  --color-space-dark: #000000;
+  --color-space-secondary: #1d1d1f;
+  --color-surface: #1d1d1f;
+  --color-border: #424245;
+  --color-accent: #0071e3;
+  --color-highlight: #2997ff;
+  --color-text: #f5f5f7;
+  --color-text-muted: #86868b;
 
   --animate-twinkle: twinkle 3s ease-in-out infinite;
   --animate-glow: glow 3s ease-in-out infinite;
@@ -257,20 +259,213 @@
   animation-delay: 0.03s;
 }
 
+@property --color-space-dark {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #000000;
+}
+
+@property --color-space-secondary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1d1d1f;
+}
+
+@property --color-surface {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1d1d1f;
+}
+
+@property --color-border {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #424245;
+}
+
+@property --color-text {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f5f5f7;
+}
+
+@property --color-text-muted {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #86868b;
+}
+
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+html.light {
+  --color-space-dark: #f5f5f7;
+  --color-space-secondary: #ffffff;
+  --color-surface: #ffffff;
+  --color-border: #d2d2d7;
+  --color-text: #1d1d1f;
+  --color-text-muted: #6e6e73;
+  --color-highlight: #0071e3;
+}
+
+/* Mac terminal stays dark in both themes — keep text light so it stays readable */
+.terminal-window {
+  --color-text: #f5f5f7;
+  --color-text-muted: #a1a1a6;
+}
+
+.theme-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  transition: opacity 0.5s ease-in-out;
+}
+
+html.theme-instant,
+html.theme-instant * {
+  transition: none !important;
 }
 
 body {
   margin: 0;
+  overflow-x: hidden;
   background-color: var(--color-space-dark);
   color: var(--color-text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+    'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes blink-cursor {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.terminal-cursor {
+  animation: blink-cursor 1s step-end infinite;
+}
+
+/* CRT scanlines — same overlay used on christiananunciado.com */
+.scanline-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.01) 2px,
+    rgba(255, 255, 255, 0.01) 4px
+  );
+}
+
 section {
-  scroll-margin-top: 5rem;
+  scroll-margin-top: 4.5rem;
+}
+
+@media (min-width: 768px) {
+  section {
+    scroll-margin-top: 5rem;
+  }
+}
+
+@keyframes modal-minimize {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  55% {
+    opacity: 0.85;
+    filter: blur(0.5px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(48vh) scale(0.12, 0.06);
+    filter: blur(2px);
+  }
+}
+
+@keyframes modal-restore {
+  0% {
+    opacity: 0;
+    transform: translateY(48vh) scale(0.12, 0.06);
+    filter: blur(2px);
+  }
+  45% {
+    opacity: 0.85;
+    filter: blur(0.5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes modal-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-minimize {
+  transform-origin: center bottom;
+  animation: modal-minimize 480ms cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+
+.modal-restore {
+  transform-origin: center bottom;
+  animation: modal-restore 480ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.modal-backdrop-in {
+  animation: modal-backdrop-in 480ms ease-out forwards;
+}
+
+@keyframes terminal-to-trash {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    filter: blur(0);
+  }
+  35% {
+    opacity: 0.9;
+    transform: translate(8%, 18%) scale(0.72) rotate(4deg);
+    filter: blur(0.5px);
+  }
+  70% {
+    opacity: 0.45;
+    transform: translate(28%, 55%) scale(0.28) rotate(10deg);
+    filter: blur(1.5px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(42%, 78%) scale(0.06) rotate(16deg);
+    filter: blur(3px);
+  }
+}
+
+.terminal-to-trash {
+  transform-origin: center center;
+  pointer-events: none;
+  animation: terminal-to-trash 520ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }

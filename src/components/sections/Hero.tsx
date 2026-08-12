@@ -9,40 +9,44 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="relative flex min-h-screen flex-col items-center justify-center px-4 pt-24 pb-16 md:px-6"
+      className="relative flex min-h-[100svh] flex-col items-center justify-center px-4 pt-24 pb-12 sm:px-5 md:px-6 md:pb-16"
     >
-      <LaunchScreen>
-        <p className="mb-4 font-mono text-xs font-medium uppercase tracking-[0.3em] text-highlight md:text-sm">
-          {hero.eyebrow}
-        </p>
+      <LaunchScreen className="w-full">
+        {hero.eyebrow && (
+          <p className="mb-4 text-sm font-medium tracking-wide text-text-muted">
+            {hero.eyebrow}
+          </p>
+        )}
 
         {hero.image && (
           <img
             src={hero.image}
             alt={hero.imageAlt ?? hero.name}
-            className="mx-auto mb-6 h-28 w-28 rounded-full object-cover ring-2 ring-highlight/40 shadow-[0_0_30px_rgba(34,211,238,0.3)] md:h-36 md:w-36"
+            className="mx-auto mb-6 h-28 w-28 rounded-full object-cover md:h-36 md:w-36"
           />
         )}
 
-        <h1 className="mb-4 text-4xl font-bold md:text-6xl">
-          <span className="bg-gradient-to-r from-white via-highlight to-accent bg-clip-text text-transparent animate-glow">
-            {hero.name}
-          </span>
+        <h1 className="mb-3 text-4xl font-semibold tracking-tight break-words text-text sm:text-5xl md:text-6xl">
+          {hero.name}
         </h1>
 
-        <p className="mb-2 text-base text-text-muted md:text-xl">
+        <p className="mx-auto mb-2 max-w-xl text-base text-pretty text-text-muted sm:text-lg md:text-2xl">
           {hero.headline}
         </p>
 
-        <p className="mb-8 font-mono text-sm text-accent md:text-base">
-          // {hero.currentPosition}
+        <p className="mb-8 text-sm text-text-muted md:text-base">
+          {hero.currentPosition}
         </p>
 
-        <div className="flex flex-wrap justify-center gap-3">
-          <Button onClick={() => scrollToSection(hero.primaryCta.targetSection)}>
+        <div className="flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-3.5">
+          <Button
+            className="w-full sm:w-auto"
+            onClick={() => scrollToSection(hero.primaryCta.targetSection)}
+          >
             {hero.primaryCta.label}
           </Button>
           <Button
+            className="w-full sm:w-auto"
             variant="secondary"
             onClick={() => scrollToSection(hero.secondaryCta.targetSection)}
           >
@@ -53,7 +57,7 @@ export function Hero() {
 
       <button
         onClick={() => scrollToSection(hero.scrollToSection)}
-        className="mt-10 animate-bounce text-text-muted transition-colors hover:text-highlight"
+        className="mt-8 text-text-muted transition-colors hover:text-text md:mt-10"
         aria-label={hero.scrollAriaLabel}
       >
         <svg
@@ -65,7 +69,7 @@ export function Hero() {
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth={2}
+            strokeWidth={1.5}
             d="M19 14l-7 7m0 0l-7-7m7 7V3"
           />
         </svg>
