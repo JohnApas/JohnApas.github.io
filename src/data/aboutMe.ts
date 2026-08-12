@@ -36,6 +36,12 @@ export const aboutMe: AboutMeContent = {
     downloadCommand: `→ Download ${resumeData.fileName}`,
     downloadLabel: 'Download resume PDF',
   },
+  actionBlocked: {
+    title: 'Action Blocked',
+    message: "This window can't be closed right now.",
+    closeAriaLabel: 'Close window',
+  },
+  minimizeAriaLabel: 'Minimize window',
   profileDetails:
     'Full-Stack Software Engineer with 3 years of experience building web applications and business systems. Skilled in frontend and backend development, API integration, databases, and deployment, with experience in React, Next.js, PHP, JavaScript, MySQL, WordPress, and GraphQL. Passionate about building scalable, maintainable, and user-friendly solutions.',
   locationLabel: 'Location:',

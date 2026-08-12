@@ -25,6 +25,13 @@ export interface HeroContent {
   scrollToSection: string
   scrollAriaLabel: string
   launchScreen: LaunchScreenContent
+  welcomeBackName: string
+  actionBlocked: {
+    title: string
+    message: string
+    closeAriaLabel: string
+  }
+  minimizeAriaLabel: string
 }
 
 // About section interface
@@ -55,6 +62,12 @@ export interface AboutMeContent {
     downloadCommand: string
     downloadLabel: string
   }
+  actionBlocked: {
+    title: string
+    message: string
+    closeAriaLabel: string
+  }
+  minimizeAriaLabel: string
   profileDetails?: string
   locationLabel: string
   address?: string

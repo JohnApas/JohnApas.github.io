@@ -19,4 +19,11 @@ export const hero: HeroContent = {
   },
   scrollToSection: 'about',
   scrollAriaLabel: 'Scroll to about section',
+  welcomeBackName: "I'm Back!",
+  actionBlocked: {
+    title: 'Action Blocked',
+    message: "This window can't be closed right now.",
+    closeAriaLabel: 'Close window',
+  },
+  minimizeAriaLabel: 'Minimize window',
 }

@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react'
 import { aboutMe } from '../../data/aboutMe'
+import { useLaunchWindowChrome } from '../../hooks/useLaunchWindowChrome'
 import { generateResumePdf } from '../../utils/generateResumePdf'
+import { AppleNotification } from '../common/AppleNotification'
 import { LaunchScreen } from '../common/LaunchScreen'
 import { SectionTitle } from '../common/SectionTitle'
 import { AboutCarousel } from './AboutCarousel'
@@ -10,6 +12,19 @@ const TRASH_CLOSE_MS = 520
 export function About() {
   const [showResumeTerminal, setShowResumeTerminal] = useState(false)
   const [isTrashing, setIsTrashing] = useState(false)
+  const {
+    notification,
+    closing,
+    dismiss,
+    isBusy,
+    windowMotionClassName,
+    handleBlockedClose,
+    handleMinimize,
+  } = useLaunchWindowChrome({
+    blockedTitle: aboutMe.actionBlocked.title,
+    blockedMessage: aboutMe.actionBlocked.message,
+    enabled: !showResumeTerminal,
+  })
   const initials = aboutMe.name
     .split(' ')
     .map((n) => n[0])
@@ -23,6 +38,13 @@ export function About() {
       setIsTrashing(false)
     }, TRASH_CLOSE_MS)
   }, [isTrashing, showResumeTerminal])
+
+  const windowClassName = [
+    isTrashing ? 'terminal-to-trash' : '',
+    !showResumeTerminal ? windowMotionClassName : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
     <section id="about" className="px-4 py-16 sm:px-6 sm:py-20 md:py-28">
@@ -38,16 +60,28 @@ export function About() {
                   : aboutMe.launchScreen
               }
               className="w-full max-w-md"
-              windowClassName={isTrashing ? 'terminal-to-trash' : ''}
+              windowClassName={windowClassName}
               contentClassName={
                 showResumeTerminal
                   ? '!py-5 !px-4 sm:!py-6 sm:!px-5 text-left'
                   : '!py-6 !px-4 sm:!py-8 sm:!px-6 md:!py-10'
               }
-              onClose={showResumeTerminal ? closeResumeTerminal : undefined}
-              onMinimize={showResumeTerminal ? closeResumeTerminal : undefined}
-              closeAriaLabel={aboutMe.resume.closeAriaLabel}
-              minimizeAriaLabel={aboutMe.resume.closeAriaLabel}
+              onClose={
+                showResumeTerminal ? closeResumeTerminal : handleBlockedClose
+              }
+              onMinimize={
+                showResumeTerminal ? closeResumeTerminal : handleMinimize
+              }
+              closeAriaLabel={
+                showResumeTerminal
+                  ? aboutMe.resume.closeAriaLabel
+                  : aboutMe.actionBlocked.closeAriaLabel
+              }
+              minimizeAriaLabel={
+                showResumeTerminal
+                  ? aboutMe.resume.closeAriaLabel
+                  : aboutMe.minimizeAriaLabel
+              }
             >
               {showResumeTerminal ? (
                 <ResumeTerminal />
@@ -58,7 +92,8 @@ export function About() {
                     onClick={() => setShowResumeTerminal(true)}
                     aria-label={aboutMe.resume.openAriaLabel}
                     title={aboutMe.resume.clickHint}
-                    className="group relative mx-auto block h-44 w-44 overflow-hidden rounded-full transition-transform hover:scale-[1.02] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:h-52 sm:w-52 md:h-64 md:w-64"
+                    disabled={isBusy}
+                    className="group relative mx-auto block h-44 w-44 overflow-hidden rounded-full transition-transform hover:scale-[1.02] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:pointer-events-none sm:h-52 sm:w-52 md:h-64 md:w-64"
                   >
                     {aboutMe.image ? (
                       <img
@@ -106,6 +141,16 @@ export function About() {
           </div>
         </div>
       </div>
+
+      {notification && (
+        <AppleNotification
+          kind={notification.kind}
+          title={notification.title}
+          message={notification.message}
+          closing={closing}
+          onDismiss={dismiss}
+        />
+      )}
     </section>
   )
 }
