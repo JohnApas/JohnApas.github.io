@@ -115,7 +115,7 @@ export function Hero() {
         )}
 
         <h1
-          className="mb-3 text-4xl font-semibold tracking-tight break-words text-text sm:text-5xl md:text-6xl"
+          className="mb-3 text-[2rem] leading-tight font-semibold tracking-tight break-words text-text sm:text-5xl md:text-6xl"
           aria-label={hero.name}
         >
           <span>{displayName}</span>

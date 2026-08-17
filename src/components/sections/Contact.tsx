@@ -7,7 +7,7 @@ import { Button } from '../common/Button'
 import { SectionTitle } from '../common/SectionTitle'
 
 const inputClass =
-  'w-full rounded-2xl border-0 bg-space-dark px-4 py-3.5 text-base text-text outline-none ring-1 ring-border/60 transition-[box-shadow,background-color] placeholder:text-text-muted/50 focus:bg-surface focus:ring-2 focus:ring-accent/40'
+  'w-full max-w-full rounded-xl border-0 bg-space-dark px-3.5 py-3 text-base text-text outline-none ring-1 ring-border/60 transition-[box-shadow,background-color] placeholder:text-text-muted/50 focus:bg-surface focus:ring-2 focus:ring-accent/40 sm:rounded-2xl sm:px-4 sm:py-3.5'
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error' | 'activation'
 
@@ -97,17 +97,122 @@ export function Contact() {
 
   return (
     <section id="contact" className="px-4 py-16 sm:px-6 sm:py-20 md:py-28">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto min-w-0 max-w-5xl">
         <SectionTitle title={contact.title} subtitle={contact.subtitle} />
 
-        <div className="overflow-hidden rounded-[28px] border border-border/70 bg-surface shadow-[0_8px_40px_rgba(0,0,0,0.04)]">
-          <div className="grid md:grid-cols-2">
-            <div className="flex flex-col justify-between gap-10 border-b border-border/70 bg-space-dark/40 p-6 sm:p-8 md:border-r md:border-b-0 md:p-10">
+        <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-[0_8px_40px_rgba(0,0,0,0.04)] sm:rounded-[24px] md:rounded-[28px]">
+          <div className="grid min-w-0 md:grid-cols-2">
+            {/* Form first on mobile so users can message without scrolling past info */}
+            <div className="order-1 min-w-0 p-5 sm:p-8 md:order-2 md:p-10">
+              <h3 className="mb-5 text-lg font-semibold tracking-tight text-text sm:mb-6 sm:text-xl">
+                {contact.formTitle}
+              </h3>
+
+              <form onSubmit={handleSubmit} className="relative space-y-4 sm:space-y-5">
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute top-0 left-0 h-px w-px overflow-hidden opacity-0"
+                >
+                  <input
+                    type="text"
+                    name="_gotcha"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="contact-name"
+                    className="mb-2 block text-sm font-medium text-text-muted"
+                  >
+                    {contact.nameLabel}
+                  </label>
+                  <input
+                    id="contact-name"
+                    type="text"
+                    required
+                    name="name"
+                    autoComplete="name"
+                    enterKeyHint="next"
+                    placeholder={contact.namePlaceholder}
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    disabled={status === 'submitting'}
+                    className={inputClass}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="contact-email"
+                    className="mb-2 block text-sm font-medium text-text-muted"
+                  >
+                    {contact.emailFieldLabel}
+                  </label>
+                  <input
+                    id="contact-email"
+                    type="email"
+                    required
+                    name="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    enterKeyHint="next"
+                    placeholder={contact.emailPlaceholder}
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    disabled={status === 'submitting'}
+                    className={inputClass}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="contact-message"
+                    className="mb-2 block text-sm font-medium text-text-muted"
+                  >
+                    {contact.messageLabel}
+                  </label>
+                  <textarea
+                    id="contact-message"
+                    required
+                    name="message"
+                    rows={4}
+                    enterKeyHint="send"
+                    placeholder={contact.messagePlaceholder}
+                    value={formData.message}
+                    onChange={(e) =>
+                      setFormData({ ...formData, message: e.target.value })
+                    }
+                    disabled={status === 'submitting'}
+                    className={`${inputClass} min-h-[120px] resize-y sm:min-h-[140px] sm:resize-none`}
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={status === 'submitting'}
+                  className="w-full disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[180px]"
+                >
+                  {status === 'submitting'
+                    ? contact.submittingLabel
+                    : contact.submitLabel}
+                </Button>
+              </form>
+            </div>
+
+            <div className="order-2 flex min-w-0 flex-col justify-between gap-6 border-t border-border/70 bg-space-dark/40 p-5 sm:gap-8 sm:p-8 md:order-1 md:gap-10 md:border-t-0 md:border-r md:p-10">
               <div>
-                <h3 className="text-2xl font-semibold tracking-tight text-text">
+                <h3 className="text-xl font-semibold tracking-tight text-text sm:text-2xl">
                   {contact.infoTitle}
                 </h3>
-                <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-pretty text-text-muted">
+                <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-pretty text-text-muted sm:text-[15px]">
                   {contact.infoDescription}
                 </p>
               </div>
@@ -177,101 +282,6 @@ export function Contact() {
                 </div>
               </div>
             </div>
-
-            <div className="p-6 sm:p-8 md:p-10">
-              <h3 className="mb-6 text-xl font-semibold tracking-tight text-text">
-                {contact.formTitle}
-              </h3>
-
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <input
-                  type="text"
-                  name="_gotcha"
-                  value={honeypot}
-                  onChange={(e) => setHoneypot(e.target.value)}
-                  tabIndex={-1}
-                  autoComplete="off"
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
-                />
-
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="mb-2 block text-sm font-medium text-text-muted"
-                  >
-                    {contact.nameLabel}
-                  </label>
-                  <input
-                    id="name"
-                    type="text"
-                    required
-                    name="name"
-                    placeholder={contact.namePlaceholder}
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    disabled={status === 'submitting'}
-                    className={inputClass}
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="mb-2 block text-sm font-medium text-text-muted"
-                  >
-                    {contact.emailFieldLabel}
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    name="email"
-                    placeholder={contact.emailPlaceholder}
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    disabled={status === 'submitting'}
-                    className={inputClass}
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="mb-2 block text-sm font-medium text-text-muted"
-                  >
-                    {contact.messageLabel}
-                  </label>
-                  <textarea
-                    id="message"
-                    required
-                    name="message"
-                    rows={5}
-                    placeholder={contact.messagePlaceholder}
-                    value={formData.message}
-                    onChange={(e) =>
-                      setFormData({ ...formData, message: e.target.value })
-                    }
-                    disabled={status === 'submitting'}
-                    className={`${inputClass} min-h-[140px] resize-none`}
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={status === 'submitting'}
-                  className="w-full sm:w-auto sm:min-w-[180px] disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {status === 'submitting'
-                    ? contact.submittingLabel
-                    : contact.submitLabel}
-                </Button>
-              </form>
-            </div>
           </div>
         </div>
 
@@ -319,12 +329,12 @@ function ContactRow({
       </span>
       <span className="min-w-0 flex-1 text-left">
         <span className="block text-xs text-text-muted">{label}</span>
-        <span className="block truncate text-[15px] font-medium text-text">
+        <span className="block break-words text-[14px] font-medium text-text sm:text-[15px]">
           {value}
         </span>
       </span>
       {href && (
-        <span className="text-text-muted/70" aria-hidden="true">
+        <span className="shrink-0 text-text-muted/70" aria-hidden="true">
           <ChevronIcon />
         </span>
       )}
@@ -332,7 +342,7 @@ function ContactRow({
   )
 
   const className =
-    'flex w-full items-center gap-3 rounded-2xl px-2 py-2.5 transition-colors hover:bg-surface/80'
+    'flex w-full min-w-0 items-start gap-3 rounded-2xl px-1.5 py-2.5 transition-colors hover:bg-surface/80 sm:items-center sm:px-2'
 
   if (href) {
     return (

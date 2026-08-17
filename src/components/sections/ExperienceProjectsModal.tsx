@@ -91,7 +91,7 @@ export function ExperienceProjectsModal({
         className={`relative z-10 flex w-full flex-col overflow-hidden border border-border bg-surface shadow-[0_24px_80px_rgba(0,0,0,0.35)] transition-[max-width,max-height,border-radius] duration-300 ease-out max-sm:rounded-t-2xl sm:rounded-2xl ${
           isMaximized
             ? 'max-h-[min(100svh,1680px)] max-w-[min(84rem,calc(100vw-2rem))] max-sm:h-[100svh] max-sm:max-w-none max-sm:rounded-none'
-            : 'max-h-[min(92svh,840px)] max-w-2xl max-sm:h-[min(92svh,840px)]'
+            : 'max-h-[min(88svh,840px)] max-w-2xl max-sm:h-[min(88svh,840px)]'
         } ${
           isMinimizing
             ? 'modal-minimize pointer-events-none'
@@ -100,8 +100,8 @@ export function ExperienceProjectsModal({
               : ''
         }`}
       >
-        <div className="relative flex h-12 shrink-0 items-center border-b border-border bg-space-dark px-3 sm:px-4">
-          <div className="group/traffic z-10 flex items-center gap-1 sm:gap-2">
+        <div className="relative flex h-12 shrink-0 items-center border-b border-border bg-space-dark px-2 sm:px-4">
+          <div className="group/traffic z-10 flex items-center gap-0.5 sm:gap-2">
             <button
               ref={closeRef}
               type="button"
@@ -196,7 +196,7 @@ export function ExperienceProjectsModal({
 
           <p
             id={titleId}
-            className="pointer-events-none absolute inset-x-24 flex h-full items-center justify-center truncate text-center text-[13px] font-medium text-text/80 sm:inset-x-16"
+            className="pointer-events-none absolute inset-x-20 flex h-full items-center justify-center truncate text-center text-[12px] font-medium text-text/80 sm:inset-x-16 sm:text-[13px]"
           >
             {windowTitle}
           </p>

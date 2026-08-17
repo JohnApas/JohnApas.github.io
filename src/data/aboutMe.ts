@@ -1,5 +1,6 @@
 import profileImage from '../assets/my-image.png'
 import type { AboutMeContent } from './interface'
+import { profile } from './profile'
 import { resume as resumeData } from './resume'
 
 export const aboutMe: AboutMeContent = {
@@ -45,7 +46,7 @@ export const aboutMe: AboutMeContent = {
   profileDetails:
     'Full-Stack Software Engineer with 3 years of experience building web applications and business systems. Skilled in frontend and backend development, API integration, databases, and deployment, with experience in React, Next.js, PHP, JavaScript, MySQL, WordPress, and GraphQL. Passionate about building scalable, maintainable, and user-friendly solutions.',
   locationLabel: 'Location:',
-  address: 'Philippines',
+  address: profile.address ?? 'Philippines',
   educationTitle: 'Education',
   skillsTitle: 'Core Technologies',
   education: [
